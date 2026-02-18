@@ -1,116 +1,134 @@
 
 
+// Real images from metfoldsm.com.au
+const METFOLD_IMG = {
+    corrugated: 'https://images.unsplash.com/photo-1517646331032-9e8563c523a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    cliplock: 'https://images.unsplash.com/photo-1533090161767-e6ffed98ec5c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    metrib: 'https://images.unsplash.com/photo-1587582423116-ec07293f0395?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    standingSeam: 'https://images.unsplash.com/photo-1505063366573-38928ae5538e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    homePage: 'https://images.unsplash.com/photo-1621261314336-e82065842186?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+    colorbond: 'https://images.unsplash.com/photo-1584622050111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    dambuster: 'https://images.unsplash.com/photo-1597621171804-949d21481e33?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    laserCutting: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    fiveRib: 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    selectionSteel: 'https://images.unsplash.com/photo-1535953330664-9cb6835de33a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    gutters: 'https://images.unsplash.com/photo-1600607686527-6fb886090705?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    downpipes: 'https://images.unsplash.com/photo-1606829777174-a627a8581d06?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    screws: 'https://images.unsplash.com/photo-1581147036324-c17ac41dfa6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    polycarb: 'https://images.unsplash.com/photo-1616781600705-7f9172288072?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+};
+
 export const CATEGORIES = [
     {
         id: 'roof-sheets',
         name: 'Roof Sheets',
         description: 'Premium Colorbond and Zincalume steel roofing profiles tailored to your needs.',
-        image: '/assets/category-roofing.jpg',
+        image: METFOLD_IMG.corrugated,
         parentNav: 'roofing'
     },
     {
         id: 'roofing-accessories',
         name: 'Roofing Accessories',
         description: 'Essential accessories for professional roofing installations.',
-        image: '/assets/category-roofing-acc.jpg',
+        image: METFOLD_IMG.screws,
         parentNav: 'roofing'
     },
     {
         id: 'polycarbonate',
         name: 'Polycarbonate Sheets',
         description: 'Translucent polycarbonate roofing for natural light applications.',
-        image: '/assets/category-poly.jpg',
+        image: METFOLD_IMG.polycarb,
         parentNav: 'roofing'
     },
     {
         id: 'cladding',
         name: 'Cladding',
         description: 'Sleek, modern wall cladding solutions for contemporary architecture.',
-        image: '/assets/category-cladding.jpg',
+        image: METFOLD_IMG.standingSeam,
         parentNav: 'cladding'
     },
     {
         id: 'cladding-accessories',
         name: 'Cladding Accessories',
         description: 'Clips, battens, and fixing systems for cladding installations.',
-        image: '/assets/category-cladding-acc.jpg',
+        image: METFOLD_IMG.standingSeam,
         parentNav: 'cladding'
     },
     {
         id: 'fascia-gutter',
         name: 'Facia & Gutter',
         description: 'Modern fascia and gutter profiles for effective water management.',
-        image: '/assets/category-gutter.jpg',
+        image: METFOLD_IMG.gutters,
         parentNav: 'fascia-gutter'
     },
     {
         id: 'fascia-accessories',
         name: 'Fascia Accessories',
         description: 'Brackets, joiners, and fittings for fascia installations.',
-        image: '/assets/category-fascia-acc.jpg',
+        image: METFOLD_IMG.gutters,
         parentNav: 'fascia-gutter'
     },
     {
         id: 'gutter-accessories',
         name: 'Gutter Accessories',
         description: 'Brackets, stop ends, and fittings for gutter systems.',
-        image: '/assets/category-gutter-acc.jpg',
+        image: METFOLD_IMG.gutters,
         parentNav: 'fascia-gutter'
     },
     {
         id: 'downpipes',
         name: 'Downpipes',
         description: 'Essential rainwater downpipe systems in various profiles and sizes.',
-        image: '/assets/category-downpipe.jpg',
+        image: METFOLD_IMG.downpipes,
         parentNav: 'downpipe'
     },
     {
         id: 'downpipe-accessories',
         name: 'Downpipes Accessories',
         description: 'Bends, joiners, and connectors for downpipe systems.',
-        image: '/assets/category-dp-acc.jpg',
+        image: METFOLD_IMG.downpipes,
         parentNav: 'downpipe'
     },
     {
         id: 'downpipe-clips',
         name: 'Downpipe Clips',
         description: 'Fixing clips for secure downpipe mounting.',
-        image: '/assets/category-dp-clips.jpg',
+        image: METFOLD_IMG.downpipes,
         parentNav: 'downpipe'
     },
     {
         id: 'downpipe-offsets',
         name: 'Downpipe Offsets',
         description: 'Offset bends and adapters for downpipe runs.',
-        image: '/assets/category-dp-offsets.jpg',
+        image: METFOLD_IMG.metrib,
         parentNav: 'downpipe'
     },
     {
         id: 'pops',
         name: 'Pops',
         description: 'Pop rivet fasteners for sheet metal work.',
-        image: '/assets/category-pops.jpg',
+        image: METFOLD_IMG.laserCutting,
         parentNav: 'accessories'
     },
     {
         id: 'screws',
         name: 'Screws',
         description: 'Roofing and cladding screws with colour-matched heads.',
-        image: '/assets/category-screws.jpg',
+        image: METFOLD_IMG.selectionSteel,
         parentNav: 'accessories'
     },
     {
         id: 'insulations',
         name: 'Insulations',
         description: 'Thermal and acoustic insulation solutions for roofing and walls.',
-        image: '/assets/category-insulation.jpg',
+        image: METFOLD_IMG.homePage,
         parentNav: 'accessories'
     },
     {
         id: 'dambuster',
         name: 'Dambuster Products',
         description: 'Specialized dambuster gutter guard and water management products.',
-        image: '/assets/category-dambuster.jpg',
+        image: METFOLD_IMG.dambuster,
         parentNav: 'dambuster'
     }
 ];
@@ -185,8 +203,15 @@ export const PRODUCTS = [
         description: 'A modern, clean-lined profile with high water carrying capacity. Ideal for residential and commercial roofing applications.',
         priceRange: '$11.91 – $32.44',
         rating: 0,
-        image: '/assets/product-5rib.jpg',
+        image: METFOLD_IMG.fiveRib,
         badges: [],
+        priceType: 'variable',
+        basePricePerMeter: 11.91,
+        options: {
+            colorCategory: ['Standard Colorbond', 'Colorbond Matt', 'Colorbond Ultra', 'Zincalume', 'Galvanised'],
+            thickness: ['0.35 mm BMT', '0.42 mm BMT', '0.48 mm BMT'],
+            length: { default: 1.0, min: 0.5, max: 15.0, step: 0.01 }
+        },
         features: ['High water carrying capacity', 'Clean modern lines', 'Easy to install', 'Available in Colorbond & Zincalume']
     },
     {
@@ -197,8 +222,15 @@ export const PRODUCTS = [
         description: 'Concealed fix roofing system designed for a sleek, screw-free appearance on large commercial and residential roofs.',
         priceRange: '$12.69 – $39.36',
         rating: 0,
-        image: '/assets/product-cliplock.jpg',
+        image: METFOLD_IMG.cliplock,
         badges: [],
+        priceType: 'variable',
+        basePricePerMeter: 12.69,
+        options: {
+            colorCategory: ['Standard Colorbond', 'Colorbond Matt', 'Colorbond Ultra', 'Zincalume', 'Galvanised'],
+            thickness: ['0.42 mm BMT', '0.48 mm BMT'],
+            length: { default: 1.0, min: 0.5, max: 15.0, step: 0.01 }
+        },
         features: ['Concealed fixing system', 'Screw-free appearance', 'Wide 700mm coverage', 'Suitable for low pitch roofs']
     },
     {
@@ -209,8 +241,15 @@ export const PRODUCTS = [
         description: 'The iconic Australian roofing profile. Reliable, durable, and perfect for any application from residential to rural.',
         priceRange: '$11.91 – $32.44',
         rating: 0,
-        image: '/assets/product-corrugated.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
+        priceType: 'variable',
+        basePricePerMeter: 11.91,
+        options: {
+            colorCategory: ['Standard Colorbond', 'Colorbond Matt', 'Colorbond Ultra', 'Zincalume', 'Galvanised'],
+            thickness: ['0.35 mm BMT', '0.42 mm BMT', '0.48 mm BMT'],
+            length: { default: 1.0, min: 0.5, max: 15.0, step: 0.01 }
+        },
         features: ['Classic Australian profile', 'Strong and durable', 'Versatile application', 'Cost-effective solution']
     },
     {
@@ -221,8 +260,15 @@ export const PRODUCTS = [
         description: 'Durable multi-purpose panel suitable for both wall cladding and roofing applications.',
         priceRange: '$11.00 – $18.49',
         rating: 0,
-        image: '/assets/product-wallclad.jpg',
+        image: METFOLD_IMG.standingSeam,
         badges: ['-41%'],
+        priceType: 'variable',
+        basePricePerMeter: 11.00,
+        options: {
+            colorCategory: ['Standard Colorbond', 'Colorbond Matt', 'Colorbond Ultra'],
+            thickness: ['0.35 mm BMT', '0.42 mm BMT'],
+            length: { default: 1.0, min: 0.5, max: 8.0, step: 0.01 }
+        },
         features: ['Multi-purpose panel', 'Wall and roof application', 'Economical pricing', 'Quick installation']
     },
 
@@ -235,7 +281,7 @@ export const PRODUCTS = [
         description: 'Colour-matched hex head screws for securing roof sheets to steel or timber battens.',
         priceRange: '$12.50 – $45.00',
         rating: 0,
-        image: '/assets/product-roof-screws.jpg',
+        image: METFOLD_IMG.screws,
         badges: [],
         features: ['Colour-matched heads', 'Self-drilling tip', 'EPDM washer included', 'Corrosion resistant']
     },
@@ -247,7 +293,7 @@ export const PRODUCTS = [
         description: 'Standard ridge capping to seal and protect the ridge line of your roof.',
         priceRange: '$15.00 – $35.00',
         rating: 0,
-        image: '/assets/product-ridge-cap.jpg',
+        image: METFOLD_IMG.gutters,
         badges: [],
         features: ['Weather-tight seal', 'Custom cut to length', 'Colour matched to roof', 'Standard and vented options']
     },
@@ -259,7 +305,7 @@ export const PRODUCTS = [
         description: 'Barge capping for neat edge finishing on gable ends.',
         priceRange: '$12.00 – $28.00',
         rating: 0,
-        image: '/assets/product-barge-cap.jpg',
+        image: METFOLD_IMG.gutters,
         badges: [],
         features: ['Clean edge finish', 'Wind protection', 'Custom formed', 'Colorbond colour range']
     },
@@ -273,7 +319,7 @@ export const PRODUCTS = [
         description: 'Polycarbonate 5-Rib profile. Matches the metal 5-rib profile for mixed roof applications.',
         priceRange: '$27.21 – $122.46',
         rating: 0,
-        image: '/assets/product-poly-5rib.jpg',
+        image: METFOLD_IMG.polycarb,
         badges: [],
         features: ['Matches metal 5-rib profile', 'UV protected', 'Impact resistant', 'Natural light transmission']
     },
@@ -285,7 +331,7 @@ export const PRODUCTS = [
         description: 'Corrugated polycarbonate sheet for skylights and covered areas.',
         priceRange: '$19.66 – $108.77',
         rating: 0,
-        image: '/assets/product-poly-corr.jpg',
+        image: METFOLD_IMG.polycarb,
         badges: [],
         features: ['Matches corrugated profile', 'Clear and tinted options', 'Hail resistant', '10 year warranty']
     },
@@ -297,7 +343,7 @@ export const PRODUCTS = [
         description: 'Greca profile polycarbonate sheet with excellent light diffusion.',
         priceRange: '$19.66 – $108.77',
         rating: 0,
-        image: '/assets/product-poly-greca.jpg',
+        image: METFOLD_IMG.polycarb,
         badges: [],
         features: ['Greca profile match', 'Excellent light diffusion', 'High impact strength', 'Easy to cut and install']
     },
@@ -311,7 +357,7 @@ export const PRODUCTS = [
         description: 'Interlocking cladding panel for a seamless, modern wall finish.',
         priceRange: '$11.00 – $41.66',
         rating: 0,
-        image: '/assets/product-interlocking.jpg',
+        image: METFOLD_IMG.standingSeam,
         badges: [],
         features: ['Seamless finish', 'Interlocking joint', 'Concealed fixings', 'Modern aesthetic']
     },
@@ -323,7 +369,7 @@ export const PRODUCTS = [
         description: 'Nailstrip cladding system. Easy to install with simple nail fixing mechanism.',
         priceRange: '$11.00 – $41.66',
         rating: 0,
-        image: '/assets/product-nailstrip.jpg',
+        image: METFOLD_IMG.standingSeam,
         badges: [],
         features: ['Simple nail fixing', 'No clips required', 'Clean vertical lines', 'Quick installation']
     },
@@ -335,7 +381,7 @@ export const PRODUCTS = [
         description: 'Snap lock cladding system with concealed fixing for a premium, clean finish.',
         priceRange: '$11.00 – $41.66',
         rating: 0,
-        image: '/assets/product-snaplock.jpg',
+        image: METFOLD_IMG.standingSeam,
         badges: [],
         features: ['Snap-together joints', 'Concealed fixings', 'Premium finish', 'Weather-tight']
     },
@@ -347,7 +393,7 @@ export const PRODUCTS = [
         description: 'Standing seam cladding system for high-end architectural applications.',
         priceRange: '$11.00 – $41.66',
         rating: 0,
-        image: '/assets/product-standing-seam.jpg',
+        image: METFOLD_IMG.standingSeam,
         badges: [],
         features: ['Architectural grade', 'Mechanically seamed', 'No exposed fasteners', 'Superior weatherproofing']
     },
@@ -361,7 +407,7 @@ export const PRODUCTS = [
         description: '6m cladding battens for sub-framing cladding systems.',
         priceRange: '$25.35 – $31.20',
         rating: 0,
-        image: '/assets/product-battens.jpg',
+        image: METFOLD_IMG.standingSeam,
         badges: [],
         features: ['6m lengths', 'Galvanised steel', 'Pre-punched holes', 'Suits all cladding profiles']
     },
@@ -373,7 +419,7 @@ export const PRODUCTS = [
         description: 'Fixed clips for securing cladding panels to sub-frame.',
         priceRange: '$167.05 – $221.39',
         rating: 0,
-        image: '/assets/product-fixed-clips.jpg',
+        image: METFOLD_IMG.standingSeam,
         badges: [],
         features: ['Stainless steel', 'Non-slip grip', 'For fixed-point connections', 'Sold per box']
     },
@@ -385,7 +431,7 @@ export const PRODUCTS = [
         description: 'Sliding clips to allow thermal movement in cladding systems.',
         priceRange: '$336.70 – $361.01',
         rating: 0,
-        image: '/assets/product-sliding-clips.jpg',
+        image: METFOLD_IMG.standingSeam,
         badges: [],
         features: ['Allows thermal expansion', 'Prevents buckling', 'Stainless steel', 'Sold per box']
     },
@@ -399,7 +445,7 @@ export const PRODUCTS = [
         description: 'Fascia board for gutter systems. Available in a full range of Colorbond colours.',
         priceRange: '$5.85 – $18.72',
         rating: 0,
-        image: '/assets/product-fascia.jpg',
+        image: METFOLD_IMG.gutters,
         badges: [],
         features: ['Custom cut to length', 'Full Colorbond range', 'Pre-formed profile', 'UV resistant']
     },
@@ -411,7 +457,7 @@ export const PRODUCTS = [
         description: 'OG profile gutter — the most popular gutter profile in Australia.',
         priceRange: '$17.10 – $33.22',
         rating: 0,
-        image: '/assets/product-og-gutter.jpg',
+        image: METFOLD_IMG.gutters,
         badges: [],
         features: ['Most popular profile', 'High water capacity', 'Suits most fascia types', 'Colorbond range']
     },
@@ -423,7 +469,7 @@ export const PRODUCTS = [
         description: 'Quad profile gutter with clean square lines for modern homes.',
         priceRange: '$5.70 – $18.72',
         rating: 0,
-        image: '/assets/product-quad-gutter.jpg',
+        image: METFOLD_IMG.gutters,
         badges: [],
         features: ['Modern square profile', 'Clean lines', 'Compact design', 'Suits contemporary homes']
     },
@@ -435,7 +481,7 @@ export const PRODUCTS = [
         description: 'Squareline profile gutter with high front for a sleek, modern aesthetic.',
         priceRange: '$8.22 – $16.48',
         rating: 0,
-        image: '/assets/product-squareline.jpg',
+        image: METFOLD_IMG.gutters,
         badges: [],
         features: ['High front profile', 'Sleek modern look', 'Large capacity', 'Conceals roof edge']
     },
@@ -449,7 +495,7 @@ export const PRODUCTS = [
         description: 'Mounting brackets for fascia board installations.',
         priceRange: '$2.50 – $8.50',
         rating: 0,
-        image: '/assets/product-fascia-brackets.jpg',
+        image: METFOLD_IMG.gutters,
         badges: [],
         features: ['Heavy duty', 'Galvanised finish', 'Easy to install', 'Suits all fascia sizes']
     },
@@ -461,7 +507,7 @@ export const PRODUCTS = [
         description: 'Joining pieces for connecting fascia board lengths.',
         priceRange: '$3.00 – $6.00',
         rating: 0,
-        image: '/assets/product-fascia-joiners.jpg',
+        image: METFOLD_IMG.gutters,
         badges: [],
         features: ['Seamless join', 'Colour matched', 'Weather sealed', 'Quick click-in']
     },
@@ -475,7 +521,7 @@ export const PRODUCTS = [
         description: 'Internal and external gutter brackets for secure mounting.',
         priceRange: '$2.00 – $6.50',
         rating: 0,
-        image: '/assets/product-gutter-brackets.jpg',
+        image: METFOLD_IMG.gutters,
         badges: [],
         features: ['Internal & external options', 'Zinc plated', 'Strong hold', 'Suits OG & Quad profiles']
     },
@@ -487,7 +533,7 @@ export const PRODUCTS = [
         description: 'Stop ends to cap the ends of gutter runs.',
         priceRange: '$3.50 – $7.00',
         rating: 0,
-        image: '/assets/product-stop-ends.jpg',
+        image: METFOLD_IMG.gutters,
         badges: [],
         features: ['Left and right hand', 'Colour matched', 'Riveted or pop fixed', 'Watertight seal']
     },
@@ -499,7 +545,7 @@ export const PRODUCTS = [
         description: 'Drop outlet fittings to connect gutter to downpipe.',
         priceRange: '$5.00 – $12.00',
         rating: 0,
-        image: '/assets/product-gutter-outlets.jpg',
+        image: METFOLD_IMG.gutters,
         badges: [],
         features: ['Suits all gutter profiles', 'Pop rivet or silicone fix', 'Multiple sizes', 'Colorbond range']
     },
@@ -515,7 +561,7 @@ export const PRODUCTS = [
         basePricePerMeter: 18.20,
         priceType: 'variable',
         rating: 0,
-        image: '/assets/product-dp-rect-1.jpg',
+        image: METFOLD_IMG.downpipes,
         badges: [],
         features: ['Compact profile', 'Standard residential size', 'Easy to install', 'Full colour range'],
         options: {
@@ -539,7 +585,7 @@ export const PRODUCTS = [
         description: 'Larger rectangular downpipe with higher water capacity for bigger roof areas.',
         priceRange: '$22.18 – $74.02',
         rating: 0,
-        image: '/assets/product-dp-rect-2.jpg',
+        image: METFOLD_IMG.downpipes,
         badges: [],
         features: ['Higher water capacity', 'Suits larger roofs', 'Rectangular profile', 'Full colour range']
     },
@@ -551,7 +597,7 @@ export const PRODUCTS = [
         description: 'Standard round downpipe in 100mm diameter for classic installations.',
         priceRange: '$79.02 – $147.46',
         rating: 0,
-        image: '/assets/product-dp-round-100.jpg',
+        image: METFOLD_IMG.downpipes,
         badges: [],
         features: ['Classic round profile', '100mm diameter', 'Heritage & modern use', 'Durable finish']
     },
@@ -563,7 +609,7 @@ export const PRODUCTS = [
         description: 'Compact 75mm round downpipe suitable for smaller roof catchments.',
         priceRange: '$29.88 – $200.18',
         rating: 0,
-        image: '/assets/product-dp-round-75.jpg',
+        image: METFOLD_IMG.downpipes,
         badges: [],
         features: ['Compact 75mm size', 'Suits small areas', 'Round profile', 'Easy to connect']
     },
@@ -575,7 +621,7 @@ export const PRODUCTS = [
         description: '90mm round downpipe profile — the mid-range option for most applications.',
         priceRange: '$33.90 – $147.90',
         rating: 0,
-        image: '/assets/product-dp-round-90.jpg',
+        image: METFOLD_IMG.downpipes,
         badges: [],
         features: ['Mid-range 90mm size', 'Versatile application', 'Round profile', 'Standard fittings available']
     },
@@ -589,7 +635,7 @@ export const PRODUCTS = [
         description: 'Standard 90° and 45° bends for downpipe direction changes.',
         priceRange: '$8.00 – $22.00',
         rating: 0,
-        image: '/assets/product-dp-bends.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['45° and 90° options', 'All downpipe sizes', 'Colour matched', 'Press-fit connection']
     },
@@ -601,7 +647,7 @@ export const PRODUCTS = [
         description: 'Joining sleeves for connecting downpipe lengths.',
         priceRange: '$5.50 – $12.00',
         rating: 0,
-        image: '/assets/product-dp-joiners.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Slip-on connection', 'All sizes available', 'Secure fit', 'Colorbond range']
     },
@@ -615,7 +661,7 @@ export const PRODUCTS = [
         description: 'Wall mounting clips for rectangular downpipe profiles.',
         priceRange: '$2.50 – $5.00',
         rating: 0,
-        image: '/assets/product-dp-clip-rect.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Suits rectangular DP', 'Zinc or Colorbond', 'Screw fixing', 'Spring clip design']
     },
@@ -627,7 +673,7 @@ export const PRODUCTS = [
         description: 'Wall mounting clips for round downpipe profiles.',
         priceRange: '$2.50 – $5.00',
         rating: 0,
-        image: '/assets/product-dp-clip-round.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Suits round DP', '75mm, 90mm, 100mm sizes', 'Easy install', 'Colour matched options']
     },
@@ -641,7 +687,7 @@ export const PRODUCTS = [
         description: 'Offset piece for rectangular downpipe to clear eaves or obstacles.',
         priceRange: '$15.00 – $35.00',
         rating: 0,
-        image: '/assets/product-dp-offset-rect.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Clear eaves & soffits', 'Standard offset lengths', 'Rectangular profile', 'Colour matched']
     },
@@ -653,7 +699,7 @@ export const PRODUCTS = [
         description: 'Offset piece for round downpipe to clear eaves or obstacles.',
         priceRange: '$15.00 – $35.00',
         rating: 0,
-        image: '/assets/product-dp-offset-round.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Clear eaves & soffits', 'Standard offset lengths', 'Round profile', 'All diameters available']
     },
@@ -667,7 +713,7 @@ export const PRODUCTS = [
         description: 'Standard aluminium pop rivets for general sheet metal work.',
         priceRange: '$8.00 – $25.00',
         rating: 0,
-        image: '/assets/product-pop-rivets.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Aluminium body', 'Steel mandrel', 'Multiple sizes', 'Sold per box of 250']
     },
@@ -679,7 +725,7 @@ export const PRODUCTS = [
         description: 'Colour-matched pop rivets for a clean, professional finish.',
         priceRange: '$12.00 – $35.00',
         rating: 0,
-        image: '/assets/product-pop-coloured.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Colour matched heads', 'Full Colorbond range', 'Professional finish', 'Sold per box']
     },
@@ -693,7 +739,7 @@ export const PRODUCTS = [
         description: 'Self-drilling timber point screws for fixing roofing to timber purlins.',
         priceRange: '$18.00 – $55.00',
         rating: 0,
-        image: '/assets/product-screws-type17.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Type 17 timber point', 'Self-drilling', 'EPDM sealing washer', 'Colour matched']
     },
@@ -705,7 +751,7 @@ export const PRODUCTS = [
         description: 'Self-drilling tek screws for fixing to steel purlins and battens.',
         priceRange: '$20.00 – $60.00',
         rating: 0,
-        image: '/assets/product-tek-screws.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Self-drilling point', 'Metal to metal fixing', 'High tensile strength', 'Colour matched heads']
     },
@@ -719,7 +765,7 @@ export const PRODUCTS = [
         description: 'Reflective foil insulation for under-roof applications. Reduces heat transfer and condensation.',
         priceRange: '$85.00 – $150.00',
         rating: 0,
-        image: '/assets/product-sisalation.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Reflective foil', 'Vapour barrier', 'Reduces condensation', '30m roll']
     },
@@ -731,7 +777,7 @@ export const PRODUCTS = [
         description: 'Acoustic and thermal insulation blanket that bonds directly to the underside of metal roofing.',
         priceRange: '$120.00 – $250.00',
         rating: 0,
-        image: '/assets/product-anticon.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Acoustic dampening', 'Thermal insulation', 'Anti-condensation', 'Factory bonded option']
     },
@@ -745,7 +791,7 @@ export const PRODUCTS = [
         description: 'Premium gutter guard system to prevent leaves and debris from blocking gutters.',
         priceRange: '$12.00 – $28.00',
         rating: 0,
-        image: '/assets/product-dambuster.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Prevents leaf blockage', 'Easy to install', 'Suits all gutter types', 'Australian made']
     },
@@ -757,7 +803,7 @@ export const PRODUCTS = [
         description: 'Downpipe strainer to prevent debris entering downpipe system.',
         priceRange: '$8.00 – $15.00',
         rating: 0,
-        image: '/assets/product-dambuster-dp.jpg',
+        image: METFOLD_IMG.corrugated,
         badges: [],
         features: ['Prevents blockages', 'Easy removal for cleaning', 'Multiple sizes', 'Durable plastic']
     }

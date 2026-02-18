@@ -1,11 +1,13 @@
 
 import React, { useState, useMemo } from 'react';
-import { PRODUCTS, CATEGORIES } from '../data/products';
+import { CATEGORIES } from '../data/products';
+import { useProducts } from '../context/ProductContext';
 import ProductCard from '../components/ProductCard';
 import { Search, Filter, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Shop = () => {
+  const { products: PRODUCTS } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
@@ -32,7 +34,7 @@ const Shop = () => {
     else if (sortBy === 'newest') result.reverse();
 
     return result;
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [searchQuery, selectedCategory, sortBy, PRODUCTS]);
 
   return (
     <div className="shop-page section page-transition">

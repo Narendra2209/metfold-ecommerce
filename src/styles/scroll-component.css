@@ -1,0 +1,86 @@
+/* =============================================
+   PRODUCT SCROLL COMPONENT
+   ============================================= */
+.product-scroll-section {
+    position: relative;
+}
+
+.product-scroll-wrapper {
+    position: relative;
+}
+
+.products-scroll {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    padding: 0.5rem 0.25rem 1.5rem;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE 10+ */
+}
+
+.products-scroll::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari/Webkit */
+}
+
+.product-scroll-item {
+    flex: 0 0 260px;
+    /* Fixed width */
+    scroll-snap-align: start;
+    height: auto;
+}
+
+.product-scroll-item .product-card {
+    height: 100%;
+}
+
+@media (min-width: 768px) {
+    .product-scroll-item {
+        flex: 0 0 280px;
+    }
+}
+
+.scroll-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    color: var(--brand-navy);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.product-scroll-wrapper:hover .scroll-arrow {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.scroll-arrow:hover {
+    background: var(--brand-navy);
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 8px 20px rgba(27, 58, 92, 0.2);
+}
+
+.scroll-arrow-left {
+    left: -22px;
+}
+
+.scroll-arrow-right {
+    right: -22px;
+}

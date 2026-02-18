@@ -1,12 +1,11 @@
-
 import React, { useRef, Suspense, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Box, ShieldCheck, RefreshCw, CirclePlay, Zap, Trophy, Truck, ArrowRight, Star, Send, Check, ChevronDown } from 'lucide-react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { ChevronRight, ChevronLeft, Box, ShieldCheck, Zap, Truck, ArrowRight, Star, Sparkles, Award, Clock, Percent } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { PRODUCTS, CATEGORIES, NAV_STRUCTURE } from '../data/products';
+import { CATEGORIES, NAV_STRUCTURE } from '../data/products';
+import { useProducts } from '../context/ProductContext';
 import ProductCard from '../components/ProductCard';
 
-// Components
 import Hero3D from '../components/Hero3D';
 
 // Animated Counter Component
@@ -37,531 +36,494 @@ const AnimatedCounter = ({ end, suffix = '', prefix = '' }) => {
   return <span ref={ref}>{prefix}{count}{suffix}</span>;
 };
 
+// Banner Carousel
+const BannerCarousel = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const banners = [
+    {
+      title: "Premium Metal Roofing",
+      subtitle: "Australian Engineered. Built to Last.",
+      desc: "Precision-engineered roofing and cladding solutions with industrial-grade durability.",
+      cta: "Shop Roofing",
+      link: "/category/roof-sheets",
+      gradient: "linear-gradient(135deg, #1B3A5C 0%, #2a5580 50%, #4A7BA7 100%)",
+      image: "https://metfoldsm.com.au/wp-content/uploads/2025/07/Untitled-design-9-1-1024x576.jpg"
+    },
+    {
+      title: "Cladding Solutions",
+      subtitle: "Modern Aesthetics. Unmatched Durability.",
+      desc: "Sleek, contemporary wall cladding for architectural excellence.",
+      cta: "Explore Cladding",
+      link: "/category/cladding",
+      gradient: "linear-gradient(135deg, #0f2b44 0%, #1B3A5C 50%, #2a5580 100%)",
+      image: "https://metfoldsm.com.au/wp-content/uploads/2025/07/Colorspan-Cladding_0000s_0000_Standing-Seam-Aluminium.jpg"
+    },
+    {
+      title: "Rainwater Systems",
+      subtitle: "Complete Gutter & Downpipe Range.",
+      desc: "Premium fascia, gutter, and downpipe systems for effective water management.",
+      cta: "View Range",
+      link: "/category/fascia-gutter",
+      gradient: "linear-gradient(135deg, #1a3650 0%, #1B3A5C 50%, #3d6d95 100%)",
+      image: "https://metfoldsm.com.au/wp-content/uploads/2026/01/Home-page-01.avif"
+    }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [banners.length]);
+
+  return (
+    <section className="banner-carousel">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentSlide}
+          className="banner-slide"
+          style={{ background: banners[currentSlide].gradient }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          {/* Background Image */}
+          {banners[currentSlide].image && (
+            <img
+              src={banners[currentSlide].image}
+              alt=""
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                opacity: 0.25,
+                mixBlendMode: 'luminosity'
+              }}
+            />
+          )}
+          {/* 3D Background */}
+          <div className="banner-3d-bg">
+            <Suspense fallback={null}>
+              <Hero3D />
+            </Suspense>
+          </div>
+          <div className="banner-overlay"></div>
+
+          <div className="container banner-content">
+            <motion.div
+              className="banner-text"
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <motion.span
+                className="banner-badge"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                <Sparkles size={14} /> PREMIUM COLLECTION
+              </motion.span>
+              <h1 className="banner-title">{banners[currentSlide].title}</h1>
+              <h2 className="banner-subtitle">{banners[currentSlide].subtitle}</h2>
+              <p className="banner-desc">{banners[currentSlide].desc}</p>
+              <div className="banner-ctas">
+                <Link to={banners[currentSlide].link} className="btn btn-primary btn-lg banner-btn">
+                  {banners[currentSlide].cta} <ArrowRight size={18} />
+                </Link>
+                <Link to="/shop" className="btn btn-secondary btn-lg banner-btn-ghost">
+                  View All Products
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Indicators */}
+      <div className="banner-indicators">
+        {banners.map((_, i) => (
+          <button
+            key={i}
+            className={`banner-dot ${i === currentSlide ? 'active' : ''}`}
+            onClick={() => setCurrentSlide(i)}
+          />
+        ))}
+      </div>
+
+      {/* Nav Arrows */}
+      <button className="banner-arrow banner-arrow-left" onClick={() => setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length)}>
+        <ChevronLeft size={24} />
+      </button>
+      <button className="banner-arrow banner-arrow-right" onClick={() => setCurrentSlide((prev) => (prev + 1) % banners.length)}>
+        <ChevronRight size={24} />
+      </button>
+    </section>
+  );
+};
+
 // Section Header Component
-const SectionHeader = ({ title, subtitle, accent }) => (
+const SectionHeader = ({ title, subtitle, accent, viewAllLink }) => (
   <motion.header
+    className="section-header"
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.6 }}
     viewport={{ once: true, margin: '-50px' }}
-    style={{ textAlign: 'center', marginBottom: '4rem' }}
   >
-    {accent && (
-      <span style={{
-        display: 'inline-block',
-        padding: '0.4rem 1.25rem',
-        background: 'rgba(27,58,92,0.08)',
-        border: '1px solid rgba(27,58,92,0.15)',
-        borderRadius: 'var(--radius-full)',
-        color: 'var(--brand-navy)',
-        fontWeight: 600,
-        fontSize: '0.85rem',
-        marginBottom: '1.5rem',
-        letterSpacing: '1px',
-        textTransform: 'uppercase'
-      }}>{accent}</span>
+    <div className="section-header-left">
+      {accent && <span className="section-accent">{accent}</span>}
+      <h2 className="text-gradient">{title}</h2>
+      {subtitle && <p className="section-subtitle">{subtitle}</p>}
+    </div>
+    {viewAllLink && (
+      <Link to={viewAllLink} className="view-all-link">
+        View All <ArrowRight size={16} />
+      </Link>
     )}
-    <h2 className="text-gradient">{title}</h2>
-    {subtitle && <p style={{ maxWidth: '600px', margin: '0 auto' }}>{subtitle}</p>}
   </motion.header>
 );
 
+// Horizontal Product Scroll
+const ProductScroll = ({ products, title, accent, viewAllLink }) => {
+  const scrollContainerRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = () => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  };
+
+  const scroll = (dir) => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * 300, behavior: 'smooth' });
+    setTimeout(checkScroll, 400);
+  };
+
+  return (
+    <div className="product-scroll-section">
+      <SectionHeader title={title} accent={accent} viewAllLink={viewAllLink} />
+      <div className="product-scroll-wrapper">
+        {canScrollLeft && (
+          <button className="scroll-arrow scroll-arrow-left" onClick={() => scroll(-1)}>
+            <ChevronLeft size={20} />
+          </button>
+        )}
+        <div
+          className="products-scroll"
+          ref={scrollContainerRef}
+          onScroll={checkScroll}
+        >
+          {products.map((product, index) => (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05, duration: 0.4 }}
+              viewport={{ once: true, margin: '-30px' }}
+              className="product-scroll-item"
+            >
+              <ProductCard product={product} />
+            </motion.div>
+          ))}
+        </div>
+        {canScrollRight && (
+          <button className="scroll-arrow scroll-arrow-right" onClick={() => scroll(1)}>
+            <ChevronRight size={20} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const Home = () => {
+  const { products: PRODUCTS } = useProducts();
+  const roofingProducts = PRODUCTS.filter(p => p.categoryId === 'roof-sheets');
+  const claddingProducts = PRODUCTS.filter(p => p.categoryId === 'cladding');
+  const allAccessories = PRODUCTS.filter(p => ['fascia-gutter', 'gutter-accessories', 'downpipes', 'downpipe-accessories'].includes(p.categoryId));
   const featuredProducts = PRODUCTS.slice(0, 8);
-  const scrollRef = useRef(null);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15, delayChildren: 0.3 }
-    }
-  };
+  // Deals State
+  const [dealProducts, setDealProducts] = useState([]);
 
-  const itemVariants = {
-    hidden: { y: 40, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: "spring", stiffness: 80, damping: 20 }
-    }
-  };
+  useEffect(() => {
+    const loadDeals = () => {
+      const savedDeals = localStorage.getItem('metfold_deals');
+      if (savedDeals) {
+        try {
+          const ids = JSON.parse(savedDeals);
+          const deals = PRODUCTS.filter(p => ids.includes(p.id));
+          if (deals.length > 0) {
+            setDealProducts(deals);
+            return;
+          }
+        } catch (e) {
+          console.error("Error parsing deals", e);
+        }
+      }
+      // Fallback
+      setDealProducts(PRODUCTS.filter(p => p.badges && p.badges.length > 0).concat(PRODUCTS.slice(0, 4)).slice(0, 5));
+    };
 
-  const fadeUpVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
-    }
+    loadDeals();
+    window.addEventListener('storage', loadDeals);
+    return () => window.removeEventListener('storage', loadDeals);
+  }, []);
+
+  // Category images map
+  const categoryImages = {
+    'roofing': 'https://www.google.com/imgres?q=metfold%20roofing&imgurl=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2F0%2F06%2FStanding_seam_metal_roof_3.jpg&imgrefurl=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FMetal_roof&docid=taE1qsSF5jajuM&tbnid=TaLeNHTvsb1XxM&vet=12ahUKEwilioqE7eGSAxVSWHADHc5XBgMQnPAOegQITxAB..i&w=4000&h=3000&hcb=2&ved=2ahUKEwilioqE7eGSAxVSWHADHc5XBgMQnPAOegQITxAB',
+    'cladding-nav': 'https://metfoldsm.com.au/wp-content/uploads/2025/07/Colorspan-Cladding_0000s_0000_Standing-Seam-Aluminium.jpg',
+    'fascia-gutter-nav': 'https://metfoldsm.com.au/wp-content/uploads/2025/07/Metrib-1024x724.jpg',
+    'downpipe-nav': 'https://metfoldsm.com.au/wp-content/uploads/2025/07/Clip-lock-700.jpg',
+    'dambuster-nav': 'https://metfoldsm.com.au/wp-content/uploads/2025/11/Dambuster_11zon.webp',
+    'accessories-nav': 'https://metfoldsm.com.au/wp-content/uploads/2025/11/selectionsteel_16_11zon.webp'
   };
 
   return (
     <div className="home-container">
-      {/* ============================================================
-          1. HERO SECTION
-          ============================================================ */}
-      <section className="hero-section" style={{ height: '100vh', position: 'relative', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
-        {/* 3D Background */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <Suspense fallback={<div style={{ background: 'var(--brand-navy)', width: '100%', height: '100%' }} />}>
-            <Hero3D />
-          </Suspense>
-        </div>
+      {/* 1. HERO BANNER CAROUSEL */}
+      <BannerCarousel />
 
-        {/* Gradient Overlays */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(27,58,92,0.85) 0%, rgba(27,58,92,0.5) 50%, rgba(27,58,92,0.75) 100%)', zIndex: 1 }}></div>
-
-        <div className="container" style={{ position: 'relative', zIndex: 10 }}>
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            style={{ maxWidth: '800px' }}
-          >
-            <motion.div variants={itemVariants} style={{
-              display: 'inline-block',
-              padding: '0.5rem 1.25rem',
-              background: 'rgba(255,255,255,0.15)',
-              border: '1px solid rgba(255,255,255,0.25)',
-              borderRadius: 'var(--radius-full)',
-              color: 'var(--text-main)',
-              fontWeight: 600,
-              fontSize: '0.85rem',
-              marginBottom: '2rem',
-              letterSpacing: '2px'
-            }}>
-              ✦ PROUDLY AUSTRALIAN OPERATED
-            </motion.div>
-
-            <motion.h1 variants={itemVariants} style={{ marginBottom: '1.5rem', fontWeight: 900, lineHeight: 1.05, color: 'white' }}>
-              REDEFINING <br />
-              METAL ARCHITECTURE
-            </motion.h1>
-
-            <motion.p variants={itemVariants} style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.85)', marginBottom: '2.5rem', maxWidth: '600px', lineHeight: 1.7 }}>
-              Metfold delivers precision-engineered roofing and cladding solutions with industrial-grade durability and premium aesthetics.
-            </motion.p>
-
-            <motion.div variants={itemVariants} style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-              <Link to="/shop" className="btn btn-primary btn-lg">
-                Explore Catalog <ChevronRight size={20} />
-              </Link>
-              <Link to="/about" className="btn btn-secondary btn-lg">
-                Watch Process <CirclePlay size={20} />
-              </Link>
-            </motion.div>
-
-            {/* Trust Badges */}
-            <motion.div variants={itemVariants} style={{ display: 'flex', gap: '2.5rem', marginTop: '4rem', flexWrap: 'wrap' }}>
-              {[
-                { icon: <ShieldCheck size={20} />, text: 'AS/NZS Certified' },
-                { icon: <Truck size={18} />, text: 'Nationwide Delivery' },
-                { icon: <Zap size={18} />, text: '24hr Quotes' }
-              ].map((item, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
-                  <div style={{ color: 'rgba(255,255,255,0.9)' }}>{item.icon}</div>
-                  {item.text}
-                </div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          style={{
-            position: 'absolute',
-            bottom: '3rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 10,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '0.5rem',
-            color: 'var(--text-dim)',
-            fontSize: '0.8rem'
-          }}
-        >
-          <span>Scroll to Explore</span>
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            <ChevronDown size={20} />
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* ============================================================
-          2. STATS BAR
-          ============================================================ */}
-      <section className="stats-section">
+      {/* 2. CATEGORY STRIP - Flipkart style with images */}
+      <section className="category-strip-section">
         <div className="container">
-          <div className="stats-grid">
-            {[
-              { value: '15', suffix: '+', color: 'var(--primary)', label: 'Years Experience' },
-              { value: '2500', suffix: '+', color: 'var(--brand-navy)', label: 'Projects Completed' },
-              { value: '100', suffix: '%', color: 'var(--brand-steel)', label: 'AU Sourced Steel' },
-              { value: '24', suffix: 'h', color: 'var(--text-main)', label: 'Quote Turnaround' }
-            ].map((stat, i) => (
-              <motion.div
-                key={i}
-                className="stat-item"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
-              >
-                <h2 style={{ color: stat.color }}>
-                  <AnimatedCounter end={stat.value} suffix={stat.suffix} />
-                </h2>
-                <p>{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================
-          3. SHOP BY CATEGORY
-          ============================================================ */}
-      <section className="section" style={{ background: '#fff' }}>
-        <div className="container">
-          <SectionHeader
-            accent="Browse Categories"
-            title="Shop By Category"
-            subtitle="Explore our comprehensive range of premium metal products for every application."
-          />
-
-          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+          <motion.div
+            className="category-strip"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
             {NAV_STRUCTURE.map((nav, index) => {
-              const firstCat = nav.hasDropdown && nav.items?.length > 0
-                ? CATEGORIES.find(c => c.id === nav.items[0].id)
-                : CATEGORIES.find(c => c.id === nav.id);
               const linkTo = nav.hasDropdown && nav.items?.length > 0
                 ? `/category/${nav.items[0].id}`
                 : nav.linkTo || `/category/${nav.id}`;
-              const description = firstCat?.description || 'Explore our product range.';
 
               return (
                 <motion.div
                   key={nav.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.08, duration: 0.5 }}
-                  viewport={{ once: true, margin: '-30px' }}
+                  transition={{ delay: index * 0.06 }}
+                  viewport={{ once: true }}
                 >
-                  <Link to={linkTo} className="glass-panel" style={{
-                    display: 'block',
-                    padding: '2rem',
-                    textDecoration: 'none',
-                    transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    height: '100%'
-                  }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-6px)';
-                      e.currentTarget.style.borderColor = 'rgba(27,58,92,0.3)';
-                      e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(27,58,92,0.05)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.borderColor = 'var(--glass-border)';
-                      e.currentTarget.style.boxShadow = 'var(--glass-shadow)';
-                    }}
-                  >
-                    <div style={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      width: '120px',
-                      height: '120px',
-                      background: `radial-gradient(circle at top right, rgba(27,58,92,0.08) 0%, transparent 70%)`,
-                      borderRadius: '0 0 0 100%',
-                      zIndex: 0
-                    }}></div>
-                    <div style={{ position: 'relative', zIndex: 1 }}>
-                      <div style={{
-                        width: '56px',
-                        height: '56px',
-                        borderRadius: '16px',
-                        background: `linear-gradient(135deg, rgba(27,58,92,0.15), rgba(27,58,92,0.05))`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: '1.5rem',
-                        color: 'var(--primary)'
-                      }}>
-                        <Box size={28} />
-                      </div>
-                      <h3 style={{ fontSize: '1.35rem', marginBottom: '0.75rem', color: 'var(--text-main)' }}>{nav.label}</h3>
-                      <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: 1.6 }}>{description}</p>
-                      {nav.hasDropdown && nav.items && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1rem' }}>
-                          {nav.items.map(sub => (
-                            <span key={sub.id} style={{
-                              fontSize: '0.75rem',
-                              padding: '0.2rem 0.6rem',
-                              background: 'rgba(255,255,255,0.04)',
-                              border: '1px solid rgba(255,255,255,0.08)',
-                              borderRadius: 'var(--radius-full)',
-                              color: 'var(--text-dim)'
-                            }}>
-                              {sub.label}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        Explore <ArrowRight size={16} />
-                      </span>
+                  <Link to={linkTo} className="category-strip-item">
+                    <div className="category-strip-icon" style={{
+                      backgroundImage: categoryImages[nav.id] ? `url(${categoryImages[nav.id]})` : 'none',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      border: categoryImages[nav.id] ? '2px solid var(--brand-navy)' : undefined
+                    }}>
+                      {!categoryImages[nav.id] && <span className="category-emoji">📦</span>}
                     </div>
+                    <span className="category-strip-label">{nav.label}</span>
                   </Link>
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ============================================================
-          4. FEATURED PRODUCTS
-          ============================================================ */}
-      <section className="section featured-products" style={{ background: 'linear-gradient(180deg, #fff 0%, #f5f7fa 100%)' }}>
+      {/* 3. FEATURED PRODUCTS GRID */}
+      <section className="section" style={{ background: '#fff', paddingTop: '3rem', paddingBottom: '3rem' }}>
         <div className="container">
           <SectionHeader
             accent="Popular Products"
             title="Featured Products"
             subtitle="Our most popular roofing and cladding solutions trusted by builders nationwide."
+            viewAllLink="/shop"
           />
-
-          <div className="products-scroll">
+          <div className="featured-grid">
             {featuredProducts.map((product, index) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05, duration: 0.5 }}
+                transition={{ delay: index * 0.05, duration: 0.4 }}
                 viewport={{ once: true, margin: '-30px' }}
               >
                 <ProductCard product={product} />
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            style={{ textAlign: 'center', marginTop: '3rem' }}
-          >
-            <Link to="/shop" className="btn btn-outline btn-lg">
-              View All Products <ArrowRight size={18} />
+      {/* 4. DEALS OF THE DAY */}
+      <section className="section deals-section" style={{ background: '#f5f7fa', paddingTop: '3rem', paddingBottom: '3rem' }}>
+        <div className="container">
+          <div className="deals-header">
+            <div className="deals-header-left">
+              <h2 className="text-gradient"><Zap size={24} style={{ display: 'inline', verticalAlign: 'middle' }} /> Deals of the Day</h2>
+              <div className="deals-timer">
+                <Clock size={16} />
+                <span>Ends in: <strong>08:45:32</strong></span>
+              </div>
+            </div>
+            <Link to="/shop" className="view-all-link">
+              View All <ArrowRight size={16} />
             </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================================
-          5. BENTO GRID FEATURES
-          ============================================================ */}
-      <section className="section" style={{ background: '#fff' }}>
-        <div className="container">
-          <SectionHeader
-            accent="Why Choose Us"
-            title="Engineered for Excellence"
-            subtitle="Our commitment to quality starts with the world's best materials."
-          />
-
-          <div className="bento-grid">
-            {/* Large Feature Card */}
-            <motion.div
-              className="glass-panel bento-item"
-              style={{ gridColumn: 'span 8', padding: '3rem', position: 'relative', overflow: 'hidden' }}
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <div style={{ position: 'relative', zIndex: 2 }}>
-                <div style={{
-                  width: '56px', height: '56px', borderRadius: '16px',
-                  background: 'linear-gradient(135deg, rgba(27,58,92,0.2), rgba(27,58,92,0.05))',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: '2rem'
-                }}>
-                  <Box size={28} color="var(--primary)" />
-                </div>
-                <h3 style={{ marginBottom: '1rem' }}>Custom CNC Folding</h3>
-                <p style={{ maxWidth: '450px', lineHeight: 1.7 }}>Our state-of-the-art facility utilizes computer-controlled folding technology to achieve tolerances down to 0.5mm on any architectural profile.</p>
-                <Link to="/about" className="btn btn-outline" style={{ marginTop: '1.5rem' }}>Our Technology <ArrowRight size={16} /></Link>
-              </div>
-              <div style={{ position: 'absolute', right: '-5%', bottom: '-10%', opacity: 0.05 }}>
-                <Box size={250} />
-              </div>
-            </motion.div>
-
-            {/* Quality Card */}
-            <motion.div
-              className="glass-panel bento-item"
-              style={{ gridColumn: 'span 4', padding: '2.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true }}
-            >
-              <div style={{
-                width: '56px', height: '56px', borderRadius: '16px',
-                background: 'linear-gradient(135deg, rgba(0,217,255,0.2), rgba(0,217,255,0.05))',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                marginBottom: '1.5rem'
-              }}>
-                <ShieldCheck size={28} color="var(--highlight)" />
-              </div>
-              <h3>Certified Quality</h3>
-              <p style={{ fontSize: '0.95rem' }}>AS/NZS ISO 9001 certified manufacturing process for guaranteed performance in Australian conditions.</p>
-            </motion.div>
-
-            {/* Rapid Response */}
-            <motion.div
-              className="glass-panel bento-item"
-              style={{ gridColumn: 'span 4', padding: '2.5rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              <div style={{
-                width: '56px', height: '56px', borderRadius: '16px',
-                background: 'linear-gradient(135deg, rgba(139,146,168,0.2), rgba(139,146,168,0.05))',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                marginBottom: '1.5rem'
-              }}>
-                <RefreshCw size={28} color="var(--secondary-light)" />
-              </div>
-              <h3>Rapid Response</h3>
-              <p style={{ fontSize: '0.95rem' }}>Optimized supply chain for fast lead times on both standard and custom profiles.</p>
-            </motion.div>
-
-            {/* Finishes Card */}
-            <motion.div
-              className="glass-panel bento-item"
-              style={{ gridColumn: 'span 8', padding: '3rem', background: 'linear-gradient(135deg, rgba(27,58,92,0.08) 0%, transparent 100%)' }}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              viewport={{ once: true }}
-            >
-              <h3 style={{ marginBottom: '1rem' }}>Architectural Finishes</h3>
-              <p style={{ maxWidth: '500px' }}>Explore our wide range of Colorbond, Zincalume, and specialized metallic coatings that stand the test of time.</p>
-              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '2rem', flexWrap: 'wrap' }}>
-                {[
-                  { name: 'Monument', hex: '#333333' },
-                  { name: 'Basalt', hex: '#696969' },
-                  { name: 'Surfmist', hex: '#F5F5F5' },
-                  { name: 'Dune', hex: '#BCAFA3' },
-                  { name: 'Ironstone', hex: '#36454F' },
-                  { name: 'Night Sky', hex: '#1C1C1C' },
-                  { name: 'Woodland', hex: '#4F4F4F' },
-                  { name: 'Manor Red', hex: '#800000' }
-                ].map((color, i) => (
-                  <motion.div
-                    key={i}
-                    whileHover={{ scale: 1.2, y: -4 }}
-                    style={{
-                      width: '40px', height: '40px',
-                      borderRadius: '50%',
-                      background: color.hex,
-                      border: '2px solid rgba(255,255,255,0.2)',
-                      cursor: 'pointer',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
-                    }}
-                    title={color.name}
-                  />
-                ))}
-              </div>
-            </motion.div>
           </div>
-        </div>
-      </section>
-
-      {/* ============================================================
-          6. PROCESS / HOW IT WORKS
-          ============================================================ */}
-      <section className="section" style={{ background: 'linear-gradient(180deg, #fff 0%, #f5f7fa 100%)' }}>
-        <div className="container">
-          <SectionHeader
-            accent="Simple Process"
-            title="How It Works"
-            subtitle="From quote to delivery, we make it easy to get the materials you need."
-          />
-
-          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
-            {[
-              { step: '01', icon: <Star size={28} />, title: 'Choose Your Profile', desc: 'Browse our catalog and select the roofing or cladding profile that suits your project.' },
-              { step: '02', icon: <Box size={28} />, title: 'Customize Options', desc: 'Select your finish, color, thickness, and custom dimensions for a perfect fit.' },
-              { step: '03', icon: <ShieldCheck size={28} />, title: 'Get Instant Quote', desc: 'Our system calculates pricing in real-time. No hidden costs, no surprises.' },
-              { step: '04', icon: <Truck size={28} />, title: 'Fast Delivery', desc: 'Your order is fabricated and shipped direct to your site with full tracking.' }
-            ].map((item, index) => (
+          <div className="deals-grid">
+            {dealProducts.map((product, i) => (
               <motion.div
-                key={index}
-                className="glass-panel"
-                style={{ padding: '2.5rem', position: 'relative', overflow: 'hidden' }}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true, margin: '-30px' }}
-                whileHover={{ y: -5, transition: { duration: 0.3 } }}
+                key={`deal-${product.id}-${i}`}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.08 }}
+                viewport={{ once: true }}
               >
-                <div style={{
-                  position: 'absolute',
-                  top: '-10px',
-                  right: '10px',
-                  fontSize: '5rem',
-                  fontWeight: 900,
-                  fontFamily: 'var(--font-heading)',
-                  color: 'rgba(255,255,255,0.03)',
-                  lineHeight: 1,
-                  zIndex: 0
-                }}>
-                  {item.step}
-                </div>
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                  <div style={{
-                    width: '56px', height: '56px', borderRadius: '16px',
-                    background: 'linear-gradient(135deg, rgba(27,58,92,0.15), rgba(27,58,92,0.05))',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    marginBottom: '1.5rem',
-                    color: 'var(--primary)'
-                  }}>
-                    {item.icon}
+                <Link to={`/product/${product.id}`} className="deal-card">
+                  <div className="deal-badge">
+                    <Percent size={12} /> Special Deal
                   </div>
-                  <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem' }}>{item.title}</h3>
-                  <p style={{ fontSize: '0.9rem', lineHeight: 1.7 }}>{item.desc}</p>
-                </div>
+                  <div className="deal-image">
+                    {product.image && !product.image.startsWith('/assets/') ? (
+                      <img src={product.image} alt={product.name} loading="lazy" />
+                    ) : (
+                      <div className="deal-placeholder">{product.name}</div>
+                    )}
+                  </div>
+                  <div className="deal-info">
+                    <h4>{product.name}</h4>
+                    <p className="deal-category">{product.categoryName}</p>
+                    <div className="deal-price">
+                      <span className="deal-current">{product.priceRange}</span>
+                    </div>
+                    <div className="deal-rating">
+                      {[...Array(5)].map((_, si) => (
+                        <Star key={si} size={12} fill="#fbbf24" color="#fbbf24" />
+                      ))}
+                      <span>(12)</span>
+                    </div>
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ============================================================
-          7. TESTIMONIALS
-          ============================================================ */}
-      <section className="section testimonials-section" style={{ background: '#fff' }}>
+      {/* 5. PROMOTIONAL BANNER */}
+      <section className="promo-banner-section">
+        <div className="container">
+          <motion.div
+            className="promo-banner"
+            initial={{ opacity: 0, scale: 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+          >
+            <div className="promo-content">
+              <span className="promo-tag"><Award size={16} /> AUSTRALIAN MADE</span>
+              <h2>Custom CNC Folding</h2>
+              <p>Precision-engineered profiles with tolerances down to 0.5mm. Get perfect results for your architectural project.</p>
+              <Link to="/about" className="btn btn-primary">Learn More <ArrowRight size={16} /></Link>
+            </div>
+            <div className="promo-visual">
+              <div className="promo-stats">
+                <div className="promo-stat">
+                  <h3><AnimatedCounter end="15" suffix="+" /></h3>
+                  <p>Years Experience</p>
+                </div>
+                <div className="promo-stat">
+                  <h3><AnimatedCounter end="2500" suffix="+" /></h3>
+                  <p>Projects Completed</p>
+                </div>
+                <div className="promo-stat">
+                  <h3><AnimatedCounter end="100" suffix="%" /></h3>
+                  <p>AU Sourced Steel</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 6. PRODUCT SCROLLS - Roofing & Cladding */}
+      <section className="section" style={{ background: '#fff', paddingTop: '3rem', paddingBottom: '1.5rem' }}>
+        <div className="container">
+          <ProductScroll
+            products={roofingProducts}
+            title="Roof Sheets"
+            accent="Roofing"
+            viewAllLink="/category/roof-sheets"
+          />
+        </div>
+      </section>
+
+      <section className="section" style={{ background: '#f5f7fa', paddingTop: '2rem', paddingBottom: '1.5rem' }}>
+        <div className="container">
+          <ProductScroll
+            products={claddingProducts}
+            title="Cladding Solutions"
+            accent="Wall Cladding"
+            viewAllLink="/category/cladding"
+          />
+        </div>
+      </section>
+
+      <section className="section" style={{ background: '#fff', paddingTop: '2rem', paddingBottom: '3rem' }}>
+        <div className="container">
+          <ProductScroll
+            products={allAccessories}
+            title="Gutters, Downpipes & More"
+            accent="Rainwater & Accessories"
+            viewAllLink="/category/fascia-gutter"
+          />
+        </div>
+      </section>
+
+      {/* 7. HOW IT WORKS */}
+      <section className="section how-it-works" style={{ background: '#f5f7fa', paddingTop: '3rem', paddingBottom: '3rem' }}>
+        <div className="container">
+          <SectionHeader
+            accent="Simple Process"
+            title="How It Works"
+            subtitle="From quote to delivery, we make it easy to get the materials you need."
+          />
+          <div className="steps-grid">
+            {[
+              { step: '01', icon: <Star size={32} />, title: 'Choose Your Profile', desc: 'Browse our catalog and select the roofing or cladding profile that suits your project.' },
+              { step: '02', icon: <Box size={32} />, title: 'Customize Options', desc: 'Select your finish, color, thickness, and custom dimensions for a perfect fit.' },
+              { step: '03', icon: <ShieldCheck size={32} />, title: 'Get Instant Quote', desc: 'Our system calculates pricing in real-time. No hidden costs, no surprises.' },
+              { step: '04', icon: <Truck size={32} />, title: 'Fast Delivery', desc: 'Your order is fabricated and shipped direct to your site with full tracking.' }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                className="step-card"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.12, duration: 0.5 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
+              >
+                <div className="step-number">{item.step}</div>
+                <div className="step-icon">{item.icon}</div>
+                <h3>{item.title}</h3>
+                <p>{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 8. TESTIMONIALS */}
+      <section className="section testimonials-section" style={{ background: '#fff', paddingTop: '3rem', paddingBottom: '3rem' }}>
         <div className="container">
           <SectionHeader
             accent="Client Testimonials"
             title="Trusted by Industry Leaders"
             subtitle="Hear what builders and architects across Australia say about working with us."
           />
-
           <div className="testimonials-grid">
             {[
               { name: 'James Mitchell', role: 'Project Manager, BuildCraft AU', initials: 'JM', text: 'Metfold\'s precision is unmatched. Their CNC folding gave us perfect profiles for our commercial project. Delivery was on schedule and quality exceeded expectations.' },
@@ -570,15 +532,14 @@ const Home = () => {
             ].map((testimonial, index) => (
               <motion.div
                 key={index}
-                className="glass-panel testimonial-card"
+                className="testimonial-card"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true, margin: '-30px' }}
-                whileHover={{ y: -4, transition: { duration: 0.3 } }}
+                viewport={{ once: true }}
+                whileHover={{ y: -4 }}
               >
-                <div className="quote-mark">"</div>
-                <div style={{ display: 'flex', gap: '4px', marginBottom: '1.5rem', position: 'relative', zIndex: 1 }}>
+                <div className="testimonial-stars">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} size={16} fill="#fbbf24" color="#fbbf24" />
                   ))}
@@ -597,91 +558,39 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ============================================================
-          8. NEWSLETTER
-          ============================================================ */}
-      <section className="section newsletter-section" style={{ background: 'linear-gradient(180deg, #fff 0%, #f5f7fa 100%)' }}>
-        <div className="container" style={{ maxWidth: '700px' }}>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            style={{ textAlign: 'center' }}
-          >
-            <div style={{
-              display: 'inline-flex',
-              padding: '0.75rem',
-              background: 'rgba(27,58,92,0.1)',
-              borderRadius: '16px',
-              marginBottom: '2rem'
-            }}>
-              <Send size={24} color="var(--primary)" />
-            </div>
-            <h2 className="text-gradient" style={{ marginBottom: '1rem' }}>Stay in the Loop</h2>
-            <p style={{ marginBottom: '2.5rem' }}>Get exclusive deals, new product updates and industry insights delivered to your inbox.</p>
-            <form className="newsletter-form" onSubmit={(e) => {
-              e.preventDefault();
-              const input = e.target.querySelector('input');
-              if (input.value) {
-                input.value = '';
-              }
-            }}>
-              <input type="email" placeholder="Enter your email address" required />
-              <button type="submit" className="btn btn-primary" style={{ whiteSpace: 'nowrap' }}>
-                Subscribe <ArrowRight size={18} />
-              </button>
-            </form>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '1rem' }}>Join 2,500+ industry professionals. Unsubscribe anytime.</p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================================
-          9. FINAL CTA
-          ============================================================ */}
-      <section className="section cta-section" style={{ textAlign: 'center' }}>
+      {/* 9. FINAL CTA + NEWSLETTER COMBINED */}
+      <section className="section cta-section" style={{ paddingTop: '3rem', paddingBottom: '3rem' }}>
         <div className="container">
           <motion.div
-            className="glass-panel"
-            style={{
-              padding: '6rem 2rem',
-              overflow: 'hidden',
-              position: 'relative'
-            }}
+            className="cta-card"
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <div style={{
-              position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-              background: 'radial-gradient(circle at 50% 120%, rgba(27,58,92,0.12) 0%, transparent 60%)',
-              zIndex: 0
-            }}></div>
-            <div style={{
-              position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-              background: 'radial-gradient(circle at 0% 0%, rgba(0,217,255,0.05) 0%, transparent 40%)',
-              zIndex: 0
-            }}></div>
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                viewport={{ once: true }}
-              >
-                <h2 className="text-gradient" style={{ marginBottom: '1.5rem', fontSize: 'clamp(2rem, 4vw, 3.5rem)' }}>Ready to Build Your Vision?</h2>
-                <p style={{ maxWidth: '600px', margin: '0 auto 3rem', fontSize: '1.1rem' }}>Join the hundreds of builders and architects who trust Metfold for their most ambitious projects.</p>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <Link to="/contact" className="btn btn-primary btn-lg">
-                    Start a Quote <ArrowRight size={18} />
-                  </Link>
-                  <Link to="/shop" className="btn btn-secondary btn-lg">
-                    Browse Shop
-                  </Link>
-                </div>
-              </motion.div>
+            <div className="cta-glow"></div>
+            <div className="cta-content">
+              <h2 className="text-gradient">Ready to Build Your Vision?</h2>
+              <p>Join the hundreds of builders and architects who trust Metfold for their most ambitious projects.</p>
+              <div className="cta-buttons">
+                <Link to="/contact" className="btn btn-primary btn-lg">
+                  Start a Quote <ArrowRight size={18} />
+                </Link>
+                <Link to="/shop" className="btn btn-secondary btn-lg">
+                  Browse Shop
+                </Link>
+              </div>
+              {/* Inline newsletter */}
+              <form className="newsletter-form" onSubmit={(e) => {
+                e.preventDefault();
+                const input = e.target.querySelector('input');
+                if (input.value) input.value = '';
+              }} style={{ marginTop: '2rem', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto' }}>
+                <input type="email" placeholder="Enter your email for updates" required style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'white' }} />
+                <button type="submit" className="btn btn-primary">
+                  Subscribe
+                </button>
+              </form>
+              <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginTop: '0.5rem' }}>Join 2,500+ industry professionals. Unsubscribe anytime.</p>
             </div>
           </motion.div>
         </div>

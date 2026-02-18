@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+@import './styles/new-components.css';
+@import './styles/scroll-component.css';
 
 :root {
   --bg-dark: #ffffff;
@@ -155,7 +157,7 @@ button {
 }
 
 .section {
-  padding: 5rem 0;
+  padding: 3rem 0;
   position: relative;
 }
 
@@ -921,7 +923,7 @@ button {
 }
 
 .home-container {
-  margin-top: -140px;
+  padding-top: 0rem;
   overflow: hidden;
 }
 

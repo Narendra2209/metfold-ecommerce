@@ -1,99 +1,134 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { PRODUCTS, CATEGORIES } from '../data/products';
-import { getColorsForFinish } from '../data/constants';
-import { ArrowLeft, Check, Info, ShoppingBag, ChevronRight, Star, Truck, ShieldCheck, RefreshCw } from 'lucide-react';
+import { CATEGORIES } from '../data/products';
+import { useProducts } from '../context/ProductContext';
+import {
+  COLORBOND_COLORS,
+  COLORBOND_MATT_COLORS,
+  COLORBOND_ULTRA_COLORS,
+  ZINCALUME_COLOR,
+  GALVANISED_COLOR
+} from '../data/constants';
+import { ArrowLeft, Check, Info, ShoppingBag, ChevronRight, Star, Truck, ShieldCheck, RefreshCw, Minus, Plus } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { motion } from 'framer-motion';
 
 const ProductPage = () => {
+  const { products: PRODUCTS } = useProducts();
   const { id } = useParams();
   const product = PRODUCTS.find(p => p.id === id);
   const category = product ? CATEGORIES.find(c => c.id === product.categoryId) : null;
   const { addToCart } = useCart();
-  const relatedProducts = product ? PRODUCTS.filter(p => p.categoryId === product.categoryId && p.id !== product.id).slice(0, 4) : [];
 
-  const [selectedOptions, setSelectedOptions] = useState({});
+  // State
+  const [colorCategory, setColorCategory] = useState('');
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [thickness, setThickness] = useState('');
+  const [cover, setCover] = useState('');
+  const [length, setLength] = useState(1.0);
   const [quantity, setQuantity] = useState(1);
   const [availableColors, setAvailableColors] = useState([]);
 
+  // Helper function defined outside or inside
+  const getColorsForCategory = (cat) => {
+    if (!cat) return [];
+    if (cat.includes('Standard') || cat === 'Colorbond') return COLORBOND_COLORS;
+    if (cat.includes('Matt')) return COLORBOND_MATT_COLORS;
+    if (cat.includes('Ultra')) return COLORBOND_ULTRA_COLORS;
+    if (cat.includes('Zincalume')) return ZINCALUME_COLOR;
+    if (cat.includes('Galvanised')) return GALVANISED_COLOR;
+    return [];
+  };
+
+  // Initialization
   useEffect(() => {
     if (!product) return;
 
-    const defaults = {};
-    let initialColors = [];
-
-    if (product.options) {
-      Object.entries(product.options).forEach(([key, value]) => {
-        if (key === 'finish' && Array.isArray(value)) {
-          defaults[key] = value[0];
-          initialColors = getColorsForFinish(value[0]);
-        } else if (value.type === 'range') defaults[key] = value.min;
-        else if (value.type === 'select') defaults[key] = value.values[0];
-        else if (Array.isArray(value)) {
-          if (key === 'color') {
-            defaults[key] = value[0];
-          } else if (typeof value[0] === 'object') {
-            defaults[key] = value[0];
-          } else {
-            defaults[key] = value[0];
-          }
-        }
-      });
+    // Set Defaults based on product.options
+    // If product has new options structure
+    if (product.options?.colorCategory) {
+      const defaultCat = product.options.colorCategory[0];
+      setColorCategory(defaultCat);
+      const colors = getColorsForCategory(defaultCat);
+      setAvailableColors(colors);
+      if (colors.length > 0) setSelectedColor(colors[0]);
     }
 
-    if (product.options?.color && !product.options.finish) {
-      initialColors = product.options.color;
+    if (product.options?.thickness) {
+      setThickness(product.options.thickness[0]);
     }
 
-    setSelectedOptions(defaults);
-    setAvailableColors(initialColors);
-    setQuantity(1);
+    if (product.options?.cover) {
+      setCover(product.options.cover[0]);
+    }
+
+    if (product.options?.length) {
+      setLength(product.options.length.default || 1.0);
+    }
   }, [product]);
+
+  // Handlers
+  const handleCategoryChange = (cat) => {
+    setColorCategory(cat);
+    const colors = getColorsForCategory(cat);
+    setAvailableColors(colors);
+    // Reset color to first available in new category
+    if (colors.length > 0) {
+      setSelectedColor(colors[0]);
+    } else {
+      setSelectedColor(null);
+    }
+  };
+
+  const calculateTotalPrice = () => {
+    if (!product) return '0.00';
+
+    let base = product.priceType === 'variable' ? product.basePricePerMeter : product.price || 0;
+
+    // Upcharges logic (simplified)
+    if (colorCategory.includes('Matt')) base *= 1.1;
+    if (colorCategory.includes('Ultra')) base *= 1.2;
+    // Thickness upcharge 
+    if (thickness && thickness.includes('0.48')) base *= 1.15;
+    else if (thickness && thickness.includes('0.42')) base *= 1.05;
+
+    if (product.priceType === 'variable') {
+      return (base * length * quantity).toFixed(2);
+    }
+    return (base * quantity).toFixed(2);
+  };
+
+  const getPriceDisplay = () => {
+    return `$${calculateTotalPrice()}`;
+  };
+
+  const handleAddToCart = () => {
+    const total = parseFloat(calculateTotalPrice());
+    const unitPrice = total / quantity;
+
+    addToCart({
+      ...product,
+      price: unitPrice
+    }, {
+      colorCategory,
+      color: selectedColor?.name,
+      color: selectedColor?.name,
+      thickness,
+      cover,
+      length: product.priceType === 'variable' ? length : undefined
+    }, quantity);
+  };
 
   if (!product) {
     return (
       <div className="container section page-transition" style={{ textAlign: 'center' }}>
         <h2>Product Not Found</h2>
-        <p style={{ marginBottom: '2rem' }}>The product you're looking for doesn't exist.</p>
         <Link to="/shop" className="btn btn-primary">Back to Shop</Link>
       </div>
     );
   }
 
-  const handleFinishChange = (finish) => {
-    const newColors = getColorsForFinish(finish);
-    setAvailableColors(newColors);
-    setSelectedOptions(prev => ({
-      ...prev,
-      finish: finish,
-      color: newColors.length > 0 ? newColors[0] : null
-    }));
-  };
-
-  const handleOptionChange = (key, value) => {
-    if (key === 'finish') {
-      handleFinishChange(value);
-    } else {
-      setSelectedOptions(prev => ({ ...prev, [key]: value }));
-    }
-  };
-
-  const getPriceDisplay = () => {
-    if (product.priceType === 'variable' && product.basePricePerMeter) {
-      const length = parseFloat(selectedOptions.length) || 1;
-      const total = (product.basePricePerMeter * length * quantity).toFixed(2);
-      return `$${total}`;
-    }
-    if (product.priceType === 'fixed' && product.basePrice) {
-      return `$${(product.basePrice * quantity).toFixed(2)}`;
-    }
-    return product.priceRange || 'Get Quote';
-  };
-
-  const handleAddToCart = () => {
-    addToCart(product, selectedOptions, quantity);
-  };
+  const isConfigurable = product.priceType === 'variable';
 
   return (
     <div className="product-page section page-transition">
@@ -115,33 +150,12 @@ const ProductPage = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="main-image">
-              <div className="placeholder-image">
-                {product.name}
-              </div>
-            </div>
-
-            {/* Trust badges below image */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginTop: '1.5rem' }}>
-              {[
-                { icon: <Truck size={18} />, text: 'Fast Delivery' },
-                { icon: <ShieldCheck size={18} />, text: 'Quality Assured' },
-                { icon: <RefreshCw size={18} />, text: 'Easy Returns' }
-              ].map((badge, i) => (
-                <div key={i} style={{
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
-                  padding: '1rem',
-                  background: 'var(--glass-surface)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.8rem',
-                  color: 'var(--text-muted)',
-                  textAlign: 'center'
-                }}>
-                  <div style={{ color: 'var(--primary)' }}>{badge.icon}</div>
-                  {badge.text}
-                </div>
-              ))}
+            <div className="main-image" style={{ overflow: 'hidden', borderRadius: 'var(--radius-md)', position: 'relative' }}>
+              <img
+                src={product.image}
+                alt={product.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
             </div>
           </motion.div>
 
@@ -167,167 +181,182 @@ const ProductPage = () => {
             </div>
 
             <p className="product-price" style={{ fontSize: '1.75rem', color: 'var(--primary)', fontWeight: 800, marginBottom: '1.5rem' }}>
-              {product.priceType === 'variable' ? `From $${product.basePricePerMeter}/m` : product.priceRange || 'Price on Application'}
+              {isConfigurable ? `$${calculateTotalPrice()}` : product.priceRange || 'Get Quote'}
+              {isConfigurable && <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 400, marginLeft: '0.5rem' }}>(Total Ex. GST)</span>}
             </p>
 
             <p className="product-description" style={{ color: 'var(--text-muted)', lineHeight: 1.8, marginBottom: '2rem' }}>
               {product.description}
             </p>
 
+            {/* CONFIGURATION PANEL */}
+            {isConfigurable && product.options && (
+              <div className="configuration-panel" style={{ padding: '1.5rem', background: '#f8fafc', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
+
+                {/* 1. Color Category */}
+                {product.options.colorCategory && (
+                  <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Color Categories:</label>
+                    <div className="select-wrapper">
+                      <select
+                        value={colorCategory}
+                        onChange={(e) => handleCategoryChange(e.target.value)}
+                        style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid #cbd5e1' }}
+                      >
+                        {product.options.colorCategory.map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. Color Dropdown & Swatches */}
+                {availableColors.length > 0 && (
+                  <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Color:</label>
+                    <select
+                      value={selectedColor?.name || ''}
+                      onChange={(e) => {
+                        const c = availableColors.find(col => col.name === e.target.value);
+                        setSelectedColor(c);
+                      }}
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid #cbd5e1', marginBottom: '1rem' }}
+                    >
+                      {availableColors.map(c => (
+                        <option key={c.name} value={c.name}>{c.name}</option>
+                      ))}
+                    </select>
+
+                    {/* Swatches */}
+                    <div className="color-swatches" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+                      {availableColors.map(c => (
+                        <button
+                          key={c.name}
+                          onClick={() => setSelectedColor(c)}
+                          title={c.name}
+                          style={{
+                            width: '32px', height: '32px', borderRadius: '50%',
+                            background: c.hex,
+                            border: selectedColor?.name === c.name ? '3px solid var(--primary)' : '2px solid #e2e8f0',
+                            boxShadow: selectedColor?.name === c.name ? '0 0 0 2px white inset' : 'none',
+                            cursor: 'pointer',
+                            transition: 'transform 0.2s'
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Thickness */}
+                {product.options.thickness && (
+                  <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Thickness:</label>
+                    <select
+                      value={thickness}
+                      onChange={(e) => setThickness(e.target.value)}
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid #cbd5e1' }}
+                    >
+                      {product.options.thickness.map(t => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* 3.5 Cover Width */}
+                {product.options.cover && (
+                  <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Cover Width:</label>
+                    <select
+                      value={cover}
+                      onChange={(e) => setCover(e.target.value)}
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid #cbd5e1' }}
+                    >
+                      {product.options.cover.map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* 4. Length */}
+                {product.options.length && (
+                  <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Length in Metre(s):</label>
+                    <input
+                      type="number"
+                      step={product.options.length.step}
+                      min={product.options.length.min}
+                      max={product.options.length.max}
+                      value={length}
+                      onChange={(e) => setLength(parseFloat(e.target.value) || 0)}
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid #cbd5e1' }}
+                    />
+                  </div>
+                )}
+
+                {/* 5. Quantity & Add to Cart */}
+                <div className="action-row" style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
+                  <div className="quantity-control" style={{ display: 'flex', alignItems: 'center', background: '#e2e8f0', borderRadius: 'var(--radius-sm)' }}>
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} style={{ padding: '0.75rem', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                      <Minus size={16} />
+                    </button>
+                    <input
+                      type="text"
+                      value={quantity}
+                      readOnly
+                      style={{ width: '40px', textAlign: 'center', background: 'transparent', border: 'none', fontWeight: 600 }}
+                    />
+                    <button onClick={() => setQuantity(quantity + 1)} style={{ padding: '0.75rem', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                      <Plus size={16} />
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={handleAddToCart}
+                    className="btn btn-primary"
+                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                  >
+                    <ShoppingBag size={18} /> Add to Cart
+                  </button>
+                </div>
+
+                <div style={{ marginTop: '1rem' }}>
+                  <button className="btn btn-outline" style={{ width: '100%', fontWeight: 700 }}>BUY NOW</button>
+                </div>
+
+                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem', fontWeight: 700 }}>
+                    <span>Total</span>
+                    <span style={{ color: 'var(--primary)' }}>${calculateTotalPrice()}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!isConfigurable && (
+              <div style={{ marginTop: '2rem' }}>
+                <button className="btn btn-primary" onClick={handleAddToCart} style={{ width: '100%' }}>Add to Cart</button>
+              </div>
+            )}
+
             {product.features && product.features.length > 0 && (
-              <div className="features-list">
+              <div className="features-list" style={{ marginTop: '2rem' }}>
                 <h4>Key Features:</h4>
-                <ul>
+                <ul style={{ listStyle: 'none', padding: 0 }}>
                   {product.features.map((f, i) => (
-                    <li key={i}><Check size={14} className="check-icon" /> {f}</li>
+                    <li key={i} style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.5rem', alignItems: 'flex-start' }}>
+                      <Check size={16} className="check-icon" style={{ marginTop: '4px', color: 'var(--success)' }} />
+                      <span style={{ color: 'var(--text-muted)' }}>{f}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
             )}
-
-            <div className="configuration-panel">
-              <h3>Customize Your Order</h3>
-
-              {product.options && Object.entries(product.options).map(([key, config]) => {
-                if (key === 'color') return null;
-
-                if (key === 'finish') {
-                  return (
-                    <div key={key} className="option-group">
-                      <label className="option-label">Finish</label>
-                      <div className="chip-group">
-                        {config.map(item => (
-                          <button
-                            key={item}
-                            className={`chip ${selectedOptions[key] === item ? 'active' : ''}`}
-                            onClick={() => handleOptionChange(key, item)}
-                          >
-                            {item}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                }
-
-                if (config.type === 'range') {
-                  return (
-                    <div key={key} className="option-group">
-                      <label className="option-label">
-                        {key.charAt(0).toUpperCase() + key.slice(1)}:
-                        <span className="selected-val">{selectedOptions[key]} {config.unit}</span>
-                      </label>
-                      <input
-                        type="range"
-                        min={config.min}
-                        max={config.max}
-                        step={config.step}
-                        value={selectedOptions[key] || config.min}
-                        onChange={(e) => handleOptionChange(key, parseFloat(e.target.value))}
-                        className="range-input"
-                      />
-                      <div className="range-meta">
-                        <span>{config.min}{config.unit}</span>
-                        <span>{config.max}{config.unit}</span>
-                      </div>
-                    </div>
-                  );
-                }
-
-                if (Array.isArray(config) || (config.type === 'select')) {
-                  const items = Array.isArray(config) ? config : config.values;
-                  return (
-                    <div key={key} className="option-group">
-                      <label className="option-label">{key.charAt(0).toUpperCase() + key.slice(1)}</label>
-                      <div className="chip-group">
-                        {items.map(item => {
-                          const label = typeof item === 'object' ? item.name : item;
-                          return (
-                            <button
-                              key={label}
-                              className={`chip ${selectedOptions[key] === item ? 'active' : ''}`}
-                              onClick={() => handleOptionChange(key, item)}
-                            >
-                              {label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                }
-                return null;
-              })}
-
-              {/* Dynamic Color Section */}
-              {availableColors.length > 0 && (
-                <div className="option-group">
-                  <label className="option-label">
-                    Color: <span className="selected-val">{selectedOptions.color?.name || 'Select'}</span>
-                  </label>
-                  <div className="color-grid">
-                    {availableColors.map((c) => (
-                      <button
-                        key={c.name}
-                        className={`color-swatch ${selectedOptions.color?.name === c.name ? 'active' : ''}`}
-                        style={{ backgroundColor: c.hex }}
-                        onClick={() => handleOptionChange('color', c)}
-                        title={c.name}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="option-group">
-                <label className="option-label">Quantity</label>
-                <div className="qty-control">
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
-                  <span>{quantity}</span>
-                  <button onClick={() => setQuantity(quantity + 1)}>+</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="add-to-cart-section">
-              <div className="est-total">
-                <span>Estimated Total:</span>
-                <span className="total-price">{getPriceDisplay()}</span>
-              </div>
-              <button className="btn btn-primary btn-block btn-lg" onClick={handleAddToCart} style={{ marginBottom: '1rem' }}>
-                <ShoppingBag size={20} /> Add to Cart
-              </button>
-              <p className="note"><Info size={14} /> Final price confirmed at checkout. GST included.</p>
-            </div>
           </motion.div>
         </div>
-
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            style={{ marginTop: '6rem' }}
-          >
-            <h2 style={{ marginBottom: '2rem' }}>Related Products</h2>
-            <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))' }}>
-              {relatedProducts.map(p => (
-                <Link key={p.id} to={`/product/${p.id}`} className="glass-panel" style={{
-                  padding: '1.5rem', textDecoration: 'none',
-                  transition: 'all 0.3s ease'
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; }}
-                >
-                  <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{p.categoryName}</p>
-                  <h4 style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>{p.name}</h4>
-                  <p style={{ color: 'var(--primary)', fontWeight: 700, marginBottom: 0 }}>{p.priceRange}</p>
-                </Link>
-              ))}
-            </div>
-          </motion.div>
-        )}
       </div>
     </div>
   );

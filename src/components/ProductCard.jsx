@@ -1,75 +1,58 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Heart, Search, Layers, Star } from 'lucide-react';
+import { Star, ShoppingCart, Heart, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const ProductCard = ({ product }) => {
   return (
-    <motion.div
-      className="product-card"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover="hover"
-      transition={{ duration: 0.3 }}
-    >
-      <div className="product-image-container">
-        <Link to={`/product/${product.id}`}>
-          {/* Placeholder image since we don't have real assets yet */}
-          <div className="product-image-placeholder">
-            <img src={product.image} alt={product.name} onError={(e) => {
-              e.target.onerror = null;
+    <Link to={`/product/${product.id}`} className="product-card" id={`product-${product.id}`}>
+      <div className="product-card-image">
+        {product.image && !product.image.startsWith('/assets/') ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+            onError={(e) => {
               e.target.style.display = 'none';
-              e.target.parentNode.classList.add('no-image');
-            }} />
-          </div>
-        </Link>
-
-        {/* Badges */}
+              e.target.nextSibling.style.display = 'flex';
+            }}
+          />
+        ) : null}
+        <div className="product-card-placeholder" style={{ display: product.image && !product.image.startsWith('/assets/') ? 'none' : 'flex' }}>
+          <span>{product.name.charAt(0)}</span>
+        </div>
         {product.badges && product.badges.length > 0 && (
-          <div className="product-badges">
-            {product.badges.map((badge, index) => (
-              <span key={index} className="badge-discount">{badge}</span>
-            ))}
-          </div>
+          <div className="product-card-badge">{product.badges[0]}</div>
         )}
-
-        {/* Hover Actions */}
-        <motion.div
-          className="product-actions"
-          variants={{
-            hover: { opacity: 1, x: 0 },
-            initial: { opacity: 0, x: 10 }
-          }}
-        >
-          <button className="action-btn" title="Add to Wishlist"><Heart size={18} /></button>
-          <button className="action-btn" title="Quick View"><Search size={18} /></button>
-          <button className="action-btn" title="Compare"><Layers size={18} /></button>
-        </motion.div>
+        <div className="product-card-overlay">
+          <motion.button
+            className="product-card-action"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={(e) => e.preventDefault()}
+          >
+            <Heart size={18} />
+          </motion.button>
+        </div>
       </div>
-
-      <div className="product-info">
-        <div className="product-category">{product.categoryName}</div>
-        <Link to={`/product/${product.id}`} className="product-title">
-          {product.name}
-        </Link>
-
-        <div className="product-rating">
+      <div className="product-card-body">
+        <p className="product-card-category">{product.categoryName}</p>
+        <h3 className="product-card-name">{product.name}</h3>
+        <div className="product-card-rating">
           {[...Array(5)].map((_, i) => (
-            <Star key={i} size={14} className="star-icon" fill="#e2e8f0" color="#e2e8f0" />
+            <Star key={i} size={12} fill="#fbbf24" color="#fbbf24" />
           ))}
+          <span className="rating-count">(12)</span>
         </div>
-
-        <div className="product-price">
-          {product.priceRange}
+        <div className="product-card-price-row">
+          <span className="product-card-price">{product.priceRange || 'Get Quote'}</span>
         </div>
-
-        <Link to={`/product/${product.id}`} className="btn-select-options">
-          SELECT OPTIONS
-        </Link>
+        <div className="product-card-cta">
+          <span>View Details</span>
+          <ArrowRight size={14} />
+        </div>
       </div>
-
-
-    </motion.div>
+    </Link>
   );
 };
 

@@ -1,21 +1,39 @@
 
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { CATEGORIES, PRODUCTS } from '../data/products';
+import { CATEGORIES } from '../data/products';
+import { useProducts } from '../context/ProductContext';
 import ProductCard from '../components/ProductCard';
 import { ArrowLeft, ChevronRight, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const CategoryPage = () => {
+  const { products: PRODUCTS } = useProducts();
   const { id } = useParams();
-  const category = CATEGORIES.find(c => c.id === id);
-  const products = PRODUCTS.filter(p => p.categoryId === id);
+
+  // Try to find in static list first
+  let category = CATEGORIES.find(c => c.id === id);
+
+  // Filter products for this ID
+  const products = PRODUCTS.filter(p => p.categoryId === id || p.categoryName === id); // Support both ID and Name matching
+
+  // If not in static list but we have products, create dynamic category
+  if (!category && products.length > 0) {
+    const first = products[0];
+    category = {
+      id: id, // Use the ID from URL
+      name: first.categoryName || id, // Use name from product or ID
+      description: `Browse our range of ${first.categoryName || id} products.`,
+      image: first.image,
+      subcategories: []
+    };
+  }
 
   if (!category) {
     return (
       <div className="container section page-transition" style={{ textAlign: 'center' }}>
         <h2>Category Not Found</h2>
-        <p style={{ marginBottom: '2rem' }}>The category you're looking for doesn't exist.</p>
+        <p style={{ marginBottom: '2rem' }}>The category "{id}" could not be found.</p>
         <Link to="/shop" className="btn btn-primary">Browse All Products</Link>
       </div>
     );
@@ -97,19 +115,18 @@ const CategoryPage = () => {
             {products.map((product, index) => (
               <motion.div
                 key={product.id}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: Math.min(index * 0.06, 0.5), duration: 0.4 }}
+                transition={{ delay: index * 0.05 }}
               >
                 <ProductCard product={product} />
               </motion.div>
             ))}
           </div>
         ) : (
-          <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center' }}>
-            <h3>No Products Yet</h3>
-            <p>We're adding products to this category soon. Check back shortly!</p>
-            <Link to="/shop" className="btn btn-primary" style={{ marginTop: '1rem' }}>Browse All Products</Link>
+          <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-muted)' }}>
+            <p>No products found in this category yet.</p>
+            <Link to="/shop" className="btn btn-outline" style={{ marginTop: '1rem' }}>Check All Products</Link>
           </div>
         )}
       </div>

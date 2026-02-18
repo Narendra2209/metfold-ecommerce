@@ -34,3 +34,6 @@ errors.txt
 errors_v2.txt
 *.ps1
 
+
+# Local MCP Config (contains secrets)
+mcp_config.json

@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Lock, Mail, Eye, EyeOff, LogIn, LogOut, Package, FileText, Settings, ChevronRight } from 'lucide-react';
+import { User, Lock, Mail, Eye, EyeOff, LogIn, LogOut, Package, FileText, Settings, ChevronRight, ShoppingCart, Heart, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const DEMO_EMAIL = 'admin@metfold.com';
 const DEMO_PASSWORD = 'metfold123';
@@ -13,9 +13,8 @@ const Account = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('metfold_logged_in') === 'true');
-    const [userName, setUserName] = useState(() => localStorage.getItem('metfold_user_name') || 'Admin');
     const [error, setError] = useState('');
+    const { isLoggedIn, userName, login, logout } = useAuth();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -23,30 +22,24 @@ const Account = () => {
 
         if (isLogin) {
             if (email === DEMO_EMAIL && password === DEMO_PASSWORD) {
-                setIsLoggedIn(true);
-                setUserName('Admin');
-                localStorage.setItem('metfold_logged_in', 'true');
-                localStorage.setItem('metfold_user_name', 'Admin');
+                login('Admin', email);
+            } else if (email && password) {
+                login(email.split('@')[0], email);
             } else {
                 setError('Invalid email or password. Use demo credentials below.');
             }
         } else {
             if (name && email && password) {
-                setIsLoggedIn(true);
-                setUserName(name);
-                localStorage.setItem('metfold_logged_in', 'true');
-                localStorage.setItem('metfold_user_name', name);
+                login(name, email);
             }
         }
     };
 
     const handleLogout = () => {
-        setIsLoggedIn(false);
+        logout();
         setEmail('');
         setPassword('');
         setName('');
-        localStorage.removeItem('metfold_logged_in');
-        localStorage.removeItem('metfold_user_name');
     };
 
     const inputStyle = {
@@ -68,17 +61,20 @@ const Account = () => {
     if (isLoggedIn) {
         return (
             <div className="account-page section page-transition" style={{ minHeight: '80vh' }}>
-                <div className="container" style={{ maxWidth: '900px' }}>
+                <div className="container" style={{ maxWidth: '1000px' }}>
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
                         {/* Welcome Header */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-                            <div>
-                                <h2 style={{ marginBottom: '0.25rem' }}>Welcome, {userName}</h2>
-                                <p style={{ margin: 0, color: 'var(--text-muted)' }}>Manage your account and orders</p>
+                        <div className="account-header">
+                            <div className="account-user-info">
+                                <div className="account-avatar">{userName.charAt(0).toUpperCase()}</div>
+                                <div>
+                                    <h2 style={{ marginBottom: '0.25rem' }}>Welcome, {userName}!</h2>
+                                    <p style={{ margin: 0, color: 'var(--text-muted)' }}>Manage your account, orders and preferences</p>
+                                </div>
                             </div>
                             <button onClick={handleLogout} className="btn btn-secondary" style={{ gap: '0.5rem' }}>
                                 <LogOut size={16} /> Sign Out
@@ -86,33 +82,52 @@ const Account = () => {
                         </div>
 
                         {/* Dashboard Grid */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+                        <div className="account-grid">
                             {[
-                                ...(email === DEMO_EMAIL ? [{ icon: <Settings size={24} />, title: 'Admin Dashboard', desc: 'Manage products & pricing', link: '/admin', color: 'var(--primary)' }] : []),
-                                { icon: <Package size={24} />, title: 'My Orders', desc: 'View and track your orders', link: '/track-order', color: 'var(--brand-navy)' },
-                                { icon: <FileText size={24} />, title: 'My Quotes', desc: 'View saved quotes', link: '/shop', color: 'var(--brand-steel)' },
-                                { icon: <Settings size={24} />, title: 'Account Settings', desc: 'Update your profile', link: '#', color: 'var(--text-muted)' },
+                                { icon: <Package size={24} />, title: 'My Orders', desc: 'Track, return, or buy things again', link: '/track-order', color: '#2874f0' },
+                                { icon: <Heart size={24} />, title: 'Wishlist', desc: 'Your saved items', link: '/shop', color: '#ff6161' },
+                                { icon: <ShoppingCart size={24} />, title: 'Cart', desc: 'View items in your cart', link: '/cart', color: '#388e3c' },
+                                { icon: <FileText size={24} />, title: 'My Quotes', desc: 'Saved and pending quotes', link: '/shop', color: '#ff9800' },
+                                { icon: <MapPin size={24} />, title: 'Addresses', desc: 'Manage your delivery addresses', link: '#', color: '#9c27b0' },
+                                { icon: <Settings size={24} />, title: 'Settings', desc: 'Profile, password, notifications', link: '#', color: '#607d8b' },
                             ].map((item, i) => (
                                 <Link key={i} to={item.link} style={{ textDecoration: 'none' }}>
                                     <motion.div
-                                        className="glass-panel"
-                                        style={{ padding: '2rem', cursor: 'pointer', transition: 'all 0.3s' }}
-                                        whileHover={{ y: -4, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
+                                        className="account-card"
+                                        whileHover={{ y: -6, boxShadow: '0 12px 32px rgba(0,0,0,0.1)' }}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.08 }}
                                     >
-                                        <div style={{
-                                            width: '48px', height: '48px', borderRadius: '12px',
-                                            background: `${item.color}15`, display: 'flex',
-                                            alignItems: 'center', justifyContent: 'center',
-                                            color: item.color, marginBottom: '1rem'
-                                        }}>
+                                        <div className="account-card-icon" style={{ background: `${item.color}15`, color: item.color }}>
                                             {item.icon}
                                         </div>
-                                        <h3 style={{ fontSize: '1.1rem', marginBottom: '0.25rem' }}>{item.title}</h3>
-                                        <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>{item.desc}</p>
-                                        <ChevronRight size={16} style={{ marginTop: '1rem', color: 'var(--text-dim)' }} />
+                                        <div className="account-card-info">
+                                            <h3>{item.title}</h3>
+                                            <p>{item.desc}</p>
+                                        </div>
+                                        <ChevronRight size={18} className="account-card-arrow" />
                                     </motion.div>
                                 </Link>
                             ))}
+                            {userName === 'Admin' && (
+                                <Link to="/admin" style={{ textDecoration: 'none' }}>
+                                    <motion.div
+                                        className="account-card"
+                                        whileHover={{ y: -6, boxShadow: '0 12px 32px rgba(0,0,0,0.1)' }}
+                                        style={{ border: '2px solid var(--primary)', background: '#f8fafc' }}
+                                    >
+                                        <div className="account-card-icon" style={{ background: 'var(--primary)', color: 'white' }}>
+                                            <Lock size={24} />
+                                        </div>
+                                        <div className="account-card-info">
+                                            <h3>Admin Dashboard</h3>
+                                            <p>Manage products & deals</p>
+                                        </div>
+                                        <ChevronRight size={18} className="account-card-arrow" />
+                                    </motion.div>
+                                </Link>
+                            )}
                         </div>
                     </motion.div>
                 </div>
